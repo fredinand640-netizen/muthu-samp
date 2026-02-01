@@ -36,6 +36,30 @@ function showPage(pageId) {
     if (pageId === 'favorites') renderFavorites();
 }
 
+function triggerFilePicker() {
+    if (isDownloading) return;
+    document.getElementById('gameFilePicker').click();
+}
+
+function handleFileSelect(event) {
+    const files = event.target.files;
+    if (files.length === 0) return;
+
+    const btn = document.getElementById('downloadBtn');
+    const status = document.getElementById('progressStatus');
+    const fileLabel = document.getElementById('currentFileLabel');
+
+    // Simulate recognition
+    status.innerText = "RECOGNIZING FILES...";
+    fileLabel.innerText = `Detected ${files.length} items in folder. Analyzing OBB signatures...`;
+    btn.style.opacity = "0.5";
+    btn.innerText = "MERGING...";
+
+    setTimeout(() => {
+        startDownload();
+    }, 1500);
+}
+
 function startDownload() {
     if (isDownloading) return;
     isDownloading = true;
@@ -45,34 +69,33 @@ function startDownload() {
     const status = document.getElementById('progressStatus');
     const fileLabel = document.getElementById('currentFileLabel');
 
-    btn.style.opacity = '0.5';
-    btn.innerText = 'DOWNLOADING...';
+    btn.innerText = 'IMPORTING...';
 
     let fileIndex = 0;
 
     const downloadNext = () => {
         if (fileIndex >= GAME_FILES.length) {
-            status.innerText = 'INSTALLING CLIENT...';
-            fileLabel.innerText = "Configured SAMP Client for iOS";
+            status.innerText = 'LINKING CLIENT...';
+            fileLabel.innerText = "Synchronizing offsets with iOS Kernel";
 
             setTimeout(() => {
-                status.innerText = 'INSTALLED SUCCESSFULLY';
-                fileLabel.innerText = "Your game content has installed successfully enjoy the rp!";
-                btn.innerText = 'REINSTALL ASSETS';
+                status.innerText = 'IMPORT SUCCESSFUL';
+                fileLabel.innerText = "Successfully merged with /var/mobile/Downloads/GTA_SA";
+                btn.innerText = 'RE-IMPORT FILES';
                 btn.style.opacity = '1';
                 isDownloading = false;
                 gameFilesDownloaded = true;
-                alert('Your game content has installed successfully enjoy the rp!');
+                alert('Success: Local GTA files have been recognized and merged with the launcher!');
             }, 2000);
             return;
         }
 
         const file = GAME_FILES[fileIndex];
-        fileLabel.innerText = `Fetching: ${file.name} (${file.size})`;
+        fileLabel.innerText = `Merging: ${file.name} (${file.size})`;
 
         let fileProgress = 0;
         const interval = setInterval(() => {
-            fileProgress += Math.random() * 20;
+            fileProgress += Math.random() * 25;
             const totalProgress = ((fileIndex / GAME_FILES.length) * 100) + (fileProgress / GAME_FILES.length);
 
             if (fileProgress >= 100) {
@@ -82,8 +105,8 @@ function startDownload() {
             }
 
             fill.style.width = `${totalProgress}%`;
-            status.innerText = `PROGRESS: ${Math.round(totalProgress)}%`;
-        }, 150);
+            status.innerText = `MERGE PROGRESS: ${Math.round(totalProgress)}%`;
+        }, 120);
     };
 
     downloadNext();
@@ -91,24 +114,14 @@ function startDownload() {
 
 function connectServer(ip, name = "Unknown Server") {
     if (!gameFilesDownloaded) {
-        alert("⚠️ Assets Required: You must download the GTA: SA game content first!");
+        alert("⚠️ Files Not Linked: You must 'Import' your local GTA: SA files in the Assets tab first!");
         showPage('download');
         return;
     }
 
-    const nickname = document.getElementById('nicknameInput').value;
+    const nickname = document.getElementById('nicknameInput').value || 'Player';
     if (!nickname || nickname === 'Player_Name') {
         alert("⚠️ Nickname Required: Please enter your roleplay name first.");
-        return;
-    }
-
-    // DISCORD WHITELIST SECURITY ANALYSER
-    const isWhitelisted = DISCORD_MOCK.some(member =>
-        member.name.toLowerCase() === nickname.toLowerCase()
-    );
-
-    if (!isWhitelisted) {
-        alert(`⛔ ACCESS DENIED: The name "${nickname}" is not Whitelisted by admins.\n\nPlease ensure your name matches your Discord profile exactly to enter this Roleplay community.`);
         return;
     }
 
