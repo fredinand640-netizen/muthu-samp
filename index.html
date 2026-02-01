@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Muthu SAMP - iOS Launcher</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="iphone-mockup">
+        <div class="notch"></div>
+        <div class="status-bar">
+            <span id="clock">12:55</span>
+            <div class="status-icons">
+                📶 🔋
+            </div>
+        </div>
+
+        <div class="content" id="homePage">
+            <header class="animate-in" style="animation-delay: 0.1s;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1>Muthu SAMP</h1>
+                        <p class="subtitle">Join San Andreas Multiplayer</p>
+                    </div>
+                </div>
+
+                <div class="glass" style="padding: 12px; margin-bottom: 20px;">
+                    <div class="stat-label" style="margin-bottom: 5px;">Your Nickname</div>
+                    <input type="text" value="Player_Name" id="nicknameInput"
+                        style="width: 100%; background: rgba(0,0,0,0.3); border: none; padding: 10px; border-radius: 8px; color: var(--primary); font-weight: 700; font-family: monospace;">
+                </div>
+
+                <div class="glass animate-in" style="padding: 15px; margin-bottom: 20px; animation-delay: 0.2s;">
+                    <div class="stat-label" style="margin-bottom: 10px;">Direct Connect</div>
+                    <input type="text" placeholder="IP Address:Port" id="directIp"
+                        style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; color: white; margin-bottom: 10px; font-family: monospace;">
+                    <button class="btn-primary" style="padding: 10px;" onclick="directConnect()">CONNECT TO IP</button>
+                </div>
+            </header>
+
+            <section class="server-list">
+                <!-- Servers only appear here after Direct Connect -->
+                <div id="recentServersContainer"></div>
+
+                <div id="emptyState" style="text-align: center; padding: 40px 20px; color: var(--text-dim);">
+                    <div style="font-size: 40px; margin-bottom: 15px;">🌐</div>
+                    <p style="font-size: 14px;">No active servers found.</p>
+                    <p style="font-size: 11px; margin-top: 5px; opacity: 0.7;">Enter an IP above to discover and join a
+                        Roleplay community.</p>
+                </div>
+
+                <!-- History Section (Hidden until connection) -->
+                <div id="historySection" style="display: none; margin-top: 30px;">
+                    <div class="stat-label" style="margin: 10px 0; font-size: 10px; color: gold;">🕒 Connection History
+                    </div>
+                    <div id="historyContainer"></div>
+                </div>
+            </section>
+        </div>
+
+        <div class="content" id="favoritesPage" style="display: none;">
+            <header>
+                <h1>Favorites</h1>
+                <p class="subtitle">Your bookmarked roleplay servers</p>
+            </header>
+            <section class="server-list" id="favoritesContainerPage">
+                <!-- Favorites will be injected here -->
+            </section>
+        </div>
+
+        <div class="content" id="downloadPage" style="display: none;">
+            <header>
+                <h1>Game Assets</h1>
+                <p class="subtitle">Manage local GTA San Andreas files</p>
+            </header>
+
+            <div class="glass" style="padding: 20px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 10px;">📦</div>
+                <div class="server-name">GTA: San Andreas (Full Client)</div>
+                <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 20px;">Required files for multiplayer
+                    connection</p>
+
+                <div
+                    style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-bottom: 10px; overflow: hidden;">
+                    <div id="progressFill"
+                        style="width: 0%; height: 100%; background: var(--primary); transition: width 0.3s;"></div>
+                </div>
+                <div class="stat-label" id="progressStatus">READY TO DOWNLOAD</div>
+                <div class="stat-label" id="currentFileLabel"
+                    style="font-size: 8px; margin-top: 5px; color: var(--primary);">Waiting for trigger...</div>
+
+                <button class="btn-primary" id="downloadBtn" style="margin-top: 20px;"
+                    onclick="startDownload()">DOWNLOAD (1.8 GB)</button>
+            </div>
+        </div>
+
+        <div class="content" id="settingsPage" style="display: none;">
+            <header>
+                <h1>Settings</h1>
+                <p class="subtitle">Customize your gameplay experience</p>
+            </header>
+
+            <div class="glass" style="padding: 10px; margin-bottom: 20px;">
+                <div class="settings-item">
+                    <span>Game Sound</span>
+                    <label class="switch">
+                        <input type="checkbox" checked id="soundToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <span>Auto-Save Screenshots</span>
+                    <label class="switch">
+                        <input type="checkbox" checked id="screenToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <span>High FPS Mode (60 FPS)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="fpsToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item" style="border-bottom: none;">
+                    <span>Chat Lines</span>
+                    <input type="number" value="10" min="5" max="20" id="chatLines"
+                        style="width: 50px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: var(--primary); border-radius: 5px; text-align: center; font-weight: bold;">
+                </div>
+            </div>
+
+            <div class="glass" style="padding: 15px;">
+                <h3 style="font-size: 14px; margin-bottom: 10px; color: var(--text-dim);">Advanced</h3>
+                <div class="settings-item" style="border-bottom: none;">
+                    <span>Clear Game Cache</span>
+                    <button
+                        style="background: rgba(255,0,0,0.2); border: 1px solid red; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 10px;">CLEAN</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="playerListModal" class="glass"
+            style="display: none; position: absolute; top: 10%; left: 5%; right: 5%; bottom: 15%; z-index: 1000; padding: 20px; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="modalServerName" style="font-size: 18px;">Online Players</h3>
+                <button onclick="closeModal()"
+                    style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div style="flex: 1; overflow-y: auto; padding-right: 5px;" id="playerContainer">
+                <!-- Players will be injected here -->
+            </div>
+            <div class="stat-label" style="margin-top: 10px; text-align: center;" id="modalPlayerCount">Total: 0 Players
+            </div>
+        </div>
+
+        <nav class="glass"
+            style="position: absolute; bottom: 20px; left: 20px; right: 20px; height: 65px; display: flex; justify-content: space-around; align-items: center; border-radius: 25px; padding-bottom: env(safe-area-inset-bottom, 0);">
+            <div onclick="showPage('home')"
+                style="cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 20px;">🌐</span>
+                <span class="stat-label" style="font-size: 8px; margin-top: 4px;">Servers</span>
+            </div>
+            <div onclick="showPage('favorites')"
+                style="cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 20px;">⭐</span>
+                <span class="stat-label" style="font-size: 8px; margin-top: 4px;">Favorites</span>
+            </div>
+            <div onclick="showPage('download')"
+                style="cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 20px;">📥</span>
+                <span class="stat-label" style="font-size: 8px; margin-top: 4px;">Assets</span>
+            </div>
+            <div onclick="showPage('settings')"
+                style="cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 20px;">⚙️</span>
+                <span class="stat-label" style="font-size: 8px; margin-top: 4px;">Settings</span>
+            </div>
+        </nav>
+        <div class="home-indicator"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
