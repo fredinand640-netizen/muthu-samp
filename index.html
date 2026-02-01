@@ -151,17 +151,85 @@
             </div>
         </div>
 
-        <div id="playerListModal" class="glass"
-            style="display: none; position: absolute; top: 10%; left: 5%; right: 5%; bottom: 15%; z-index: 1000; padding: 20px; flex-direction: column;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 id="modalServerName" style="font-size: 18px;">Online Players</h3>
-                <button onclick="closeModal()"
-                    style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+        <div class="content" id="gamePage"
+            style="display: none; padding: 0; background: #000; overflow: hidden; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000;">
+            <!-- Loading Screen -->
+            <div id="gameLoading"
+                style="position: absolute; inset: 0; background: url('https://wallpaperaccess.com/full/1162985.jpg') center/cover; z-index: 10; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
+                <div
+                    style="background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px; backdrop-filter: blur(10px);">
+                    <div class="server-name" id="loadingServerName">CONNECTING TO SERVER...</div>
+                    <div
+                        style="width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 10px 0; overflow: hidden;">
+                        <div id="gameLoadFill"
+                            style="width: 0%; height: 100%; background: var(--primary); transition: width 0.1s;"></div>
+                    </div>
+                    <div class="stat-label" id="loadingStatus">INITIALIZING STREAMER...</div>
+                </div>
             </div>
-            <div style="flex: 1; overflow-y: auto; padding-right: 5px;" id="playerContainer">
-                <!-- Players will be injected here -->
-            </div>
-            <div class="stat-label" style="margin-top: 10px; text-align: center;" id="modalPlayerCount">Total: 0 Players
+
+            <!-- Game UI / HUD -->
+            <div id="gameHUD" style="position: absolute; inset: 0; display: none; pointer-events: none;">
+                <!-- Chat Box -->
+                <div id="gameChat"
+                    style="position: absolute; top: 50px; left: 20px; width: 70%; max-height: 150px; overflow: hidden; pointer-events: auto;">
+                    <div style="font-size: 11px; text-shadow: 1px 1px #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; gap: 2px;"
+                        id="chatMessages">
+                        <!-- Messages Injected Here -->
+                    </div>
+                </div>
+
+                <!-- Radar / Minimap -->
+                <div
+                    style="position: absolute; bottom: 40px; left: 20px; width: 100px; height: 100px; border: 3px solid #000; border-radius: 2px; background: rgba(0,0,0,0.5); overflow: hidden;">
+                    <div
+                        style="position: absolute; inset: 0; background: url('https://media.gtanet.com/images/4375_gta_iv_radar.jpg') center/cover; opacity: 0.8;">
+                    </div>
+                    <div
+                        style="position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: white; transform: translate(-50%, -50%) rotate(45deg); border: 1px solid black;">
+                    </div>
+                </div>
+
+                <!-- Stats (Money, Health, Armor) -->
+                <div style="position: absolute; top: 50px; right: 20px; text-align: right;">
+                    <div id="gameMoney"
+                        style="color: #2b6a2e; font-size: 24px; font-weight: 900; -webkit-text-stroke: 1px black; font-family: 'Pricedown', 'Inter', sans-serif;">
+                        $00001500</div>
+                    <div
+                        style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; margin-top: 5px;">
+                        <!-- Armor Bar -->
+                        <div style="width: 80px; height: 10px; background: rgba(0,0,0,0.5); border: 1px solid #000;">
+                            <div style="width: 100%; height: 100%; background: #ffffff;"></div>
+                        </div>
+                        <!-- Health Bar -->
+                        <div style="width: 80px; height: 10px; background: rgba(0,0,0,0.5); border: 1px solid #000;">
+                            <div style="width: 80%; height: 100%; background: #b71c1c;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weapon Icon -->
+                <div
+                    style="position: absolute; top: 120px; right: 20px; width: 60px; height: 60px; background: rgba(0,0,0,0.3); border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);">
+                    <span style="font-size: 30px;">🔫</span>
+                </div>
+
+                <!-- Controls Overlays (Visual Only) -->
+                <div
+                    style="position: absolute; bottom: 40px; right: 20px; display: flex; flex-direction: column; gap: 10px; pointer-events: auto;">
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="quitGame()" class="glass"
+                            style="width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; background: rgba(255,0,0,0.3);">EXIT</button>
+                        <button class="glass"
+                            style="width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px;">⌨️</button>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="glass"
+                            style="width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px;">🏃</button>
+                        <button class="glass"
+                            style="width: 60px; height: 60px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px;">👊</button>
+                    </div>
+                </div>
             </div>
         </div>
 

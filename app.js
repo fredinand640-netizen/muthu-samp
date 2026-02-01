@@ -27,7 +27,7 @@ const historyServers = [];
 const recentServers = [];
 
 function showPage(pageId) {
-    const pages = ['homePage', 'downloadPage', 'settingsPage', 'favoritesPage'];
+    const pages = ['homePage', 'downloadPage', 'settingsPage', 'favoritesPage', 'gamePage'];
     pages.forEach(p => {
         const el = document.getElementById(p);
         if (el) el.style.display = p === pageId + 'Page' || (pageId === 'home' && p === 'homePage') ? 'block' : 'none';
@@ -145,13 +145,90 @@ function connectServer(ip, name = "Unknown Server") {
     setTimeout(() => {
         if (btn) btn.innerText = "OPENING MUTHU SAMP...";
         setTimeout(() => {
-            alert(`MUTHU SAMP iOS\n-----------------\nPlayer: ${nickname}\nServer: ${ip}\nSound: ${sound}\nFPS Limit: ${fps}\n\nStatus: Connection established. Welcome back to the RP!`);
             if (btn) {
                 btn.innerText = originalText;
                 btn.style.opacity = "1";
             }
+            startGameSimulation(name, nickname);
         }, 1500);
     }, 1000);
+}
+
+function startGameSimulation(serverName, playerName) {
+    showPage('game');
+    const loading = document.getElementById('gameLoading');
+    const hud = document.getElementById('gameHUD');
+    const loadFill = document.getElementById('gameLoadFill');
+    const status = document.getElementById('loadingStatus');
+    const serverLabel = document.getElementById('loadingServerName');
+
+    serverLabel.innerText = serverName.toUpperCase();
+    loading.style.display = 'flex';
+    hud.style.display = 'none';
+    loadFill.style.width = '0%';
+
+    let progress = 0;
+    const loadSteps = [
+        "Connecting to 127.0.0.1:7777...",
+        "Authorizing with iOS Game Center...",
+        "Loading textures and models...",
+        "Synchronizing world state...",
+        "Spawning player at Los Santos..."
+    ];
+
+    const interval = setInterval(() => {
+        progress += Math.random() * 5;
+        loadFill.style.width = `${progress}%`;
+
+        const stepIndex = Math.floor((progress / 100) * loadSteps.length);
+        if (loadSteps[stepIndex]) status.innerText = loadSteps[stepIndex];
+
+        if (progress >= 100) {
+            clearInterval(interval);
+            loading.style.display = 'none';
+            hud.style.display = 'block';
+            initGameUI(playerName);
+        }
+    }, 50);
+}
+
+function initGameUI(playerName) {
+    const chat = document.getElementById('chatMessages');
+    chat.innerHTML = '';
+
+    addChatMessage(`Connected to {B9C9BF}Muthu Global Roleplay`, "#FFFFFF");
+    addChatMessage(`Welcome back, {B9C9BF}${playerName}`, "#FFFFFF");
+    addChatMessage(`SERVER: {FFFFFF}Type /help for a list of commands.`, "#4caf50");
+    addChatMessage(`Admins: {FFFFFF}Kishore_Dev is currently on-duty.`, "#b71c1c");
+
+    // Periodic chat messages
+    setInterval(() => {
+        if (document.getElementById('gamePage').style.display !== 'none') {
+            const randomMsg = [
+                "{B9C9BF}News: {FFFFFF}The LSPD is recruiting new officers!",
+                "{FF0000}Ad: {FFFFFF}Selling Sultan Full Tune - Contact 555-0123",
+                playerName + " has been promoted to Rank 2 in 'The Grove Street Families'",
+                "{00FF00}Success: {FFFFFF}You have received $500 paycheck."
+            ];
+            addChatMessage(randomMsg[Math.floor(Math.random() * randomMsg.length)], "#FFFFFF");
+        }
+    }, 10000);
+}
+
+function addChatMessage(msg, color) {
+    const chat = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    // Replace SAMP style color codes {XXXXXX} with spans
+    const formattedMsg = msg.replace(/\{([A-Fa-f0-9]{6})\}/g, '<span style="color: #$1">').replace(/\}/g, '</span>');
+    div.innerHTML = `<span style="color: ${color}">${formattedMsg}</span>`;
+    chat.appendChild(div);
+    if (chat.children.length > 8) chat.removeChild(chat.children[0]);
+}
+
+function quitGame() {
+    if (confirm("Are you sure you want to quit the game session?")) {
+        showPage('home');
+    }
 }
 
 function directConnect() {

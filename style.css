@@ -336,3 +336,36 @@ input:checked+.slider {
 input:checked+.slider:before {
     transform: translateX(20px);
 }
+
+/* Game Simulation Specifics */
+@font-face {
+    font-family: 'Pricedown';
+    src: url('https://fonts.cdnfonts.com/s/14878/pricedown%20bl.woff') format('woff');
+}
+
+#chatMessages div {
+    margin-bottom: 2px;
+    line-height: 1.2;
+    animation: chatSlide 0.3s ease-out;
+}
+
+@keyframes chatSlide {
+    from {
+        transform: translateX(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+#gameHUD button:active {
+    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#gameMoney {
+    text-shadow: 2px 2px 0px #000;
+}
